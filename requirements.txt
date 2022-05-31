@@ -1,0 +1,9 @@
+Django==3.1.2
+djangorestframework
+djangorestframework_simplejwt==4.4.0
+django-filter==2.4.0
+requests==2.25.0
+djangorestframework==3.12.2
+mysqlclient
+discord
+aiocron

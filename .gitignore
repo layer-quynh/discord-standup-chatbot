@@ -1,0 +1,11 @@
+config.py
+db.sqlite3
+.idea
+*.pyc
+__pycache__
+venv
+py37
+py
+files
+tests
+scripts
