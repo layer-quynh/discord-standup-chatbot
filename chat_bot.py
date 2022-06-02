@@ -11,11 +11,12 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 
 @aiocron.crontab('* * * * *')
-async def cornjob1():
+async def cronjob1():
     for guild in bot.guilds:
         if guild.id == SERVER_ID:
             for mem in guild.members:
-                # print(mem)
+                if mem.bot:
+                    continue
                 channel = bot.get_user(mem.id)
                 genesis_channel = bot.get_channel(CHANNEL_ID)
                 # await bot.change_presence(status=Status.idle)
@@ -38,11 +39,13 @@ async def cornjob1():
 
                     if will_do_message.author.id == mem.id:
                         today = datetime.datetime.now().date().strftime('%d/%m/%Y')
-                        report_content = will_do_message.author.name + " posted an update for Daily Standup in " + \
+                        mem_id = '<@' + str(mem.id) + '>'
+                        report_content = mem_id + " posted an update for Daily Standup in " + \
                                          today + ' : \n' + 'What you did since yesterday: ' + did_message.content + '\n' + \
                                          'What will you do today: ' + will_do_message.content
-                        await channel.send(report_content)
-                        await genesis_channel.send(report_content)
+                        await channel.send("Yay! You sent the report")
+                        report = await genesis_channel.send(report_content)
+                        print(report.report_content)
 
 
 @bot.event
@@ -51,8 +54,8 @@ async def on_ready():
     guilds = bot.guilds
     for guild in guilds:
         if guild.id == SERVER_ID:
-            for mem in guild.members:
-                print(mem)
+            # for mem in guild.members:
+            #     print(mem.id)
             for channel in guild.channels:
                 # print("Channel: ", channel)
                 if channel.name == 'channel-test':
