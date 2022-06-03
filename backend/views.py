@@ -35,6 +35,20 @@ class SaveUser(GenericAPIView):
         return Response(res)
 
 
+class GetUser(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request):
+        param = request.GET
+        userid = param.get("id", None)
+
+        user = User.objects.filter(id=userid).first()
+        print(user)
+
+        res = UserSerializer(instance=user).data
+        return Response(res)
+
+
 class SavePost(GenericAPIView):
     authentication_classes = ()
 
@@ -45,18 +59,25 @@ class SavePost(GenericAPIView):
         id_channel = body.get("id_channel", None)
         do_yesterday = body.get("do_yesterday", None)
         do_today = body.get("do_today", None)
-        time_post = body.get("time_post", None)
-
-        content = time_post + \
-                  "What you did since yesterday?" + \
-                  " - " + do_yesterday + \
-                  "What will you do today?" + \
-                  " - " + do_today
+        content = body.get("content", None)
 
         post = Post(user_id=user_id, status=status, id_channel=id_channel, do_yesterday=do_yesterday, do_today=do_today,
                     content=content, time_post=datetime.datetime.now())
         post.save()
-        print(post)
+        post_serializer = PostSerializer(instance=post)
+        res = post_serializer.data
+        return Response(res)
+
+
+class GetPost(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request):
+        param = request.GET
+        post_id = param.get("id", None)
+
+        post = Post.objects.filter(id=post_id).first()
+
         post_serializer = PostSerializer(instance=post)
         res = post_serializer.data
         return Response(res)
