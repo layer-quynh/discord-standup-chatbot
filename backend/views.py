@@ -1,3 +1,4 @@
+import datetime
 from datetime import time
 
 from django.http import HttpResponse
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from backend.models import User, Post
 from django.core import serializers
 import json
+from backend.serializers import UserSerializer, PostSerializer
 
 
 class TestView(GenericAPIView):
@@ -28,8 +30,9 @@ class SaveUser(GenericAPIView):
         discord_user_id = body.get("discord_user_id", None)
 
         user = User(user_name=user_name, discord_user_id=discord_user_id)
-        data_response = serializers.serialize('json', [user, ])
-        return HttpResponse(data_response, content_type="text/json-comment-filtered")
+        user.save()
+        res = UserSerializer(instance=user).data
+        return Response(res)
 
 
 class SavePost(GenericAPIView):
@@ -51,11 +54,12 @@ class SavePost(GenericAPIView):
                   " - " + do_today
 
         post = Post(user_id=user_id, status=status, id_channel=id_channel, do_yesterday=do_yesterday, do_today=do_today,
-                    content=content, time_post=time_post)
+                    content=content, time_post=datetime.datetime.now())
         post.save()
         print(post)
-        data_response = serializers.serialize('json', [post, ])
-        return HttpResponse(data_response, content_type="text/json-comment-filtered")
+        post_serializer = PostSerializer(instance=post)
+        res = post_serializer.data
+        return Response(res)
 
 
 class UserView(GenericAPIView):

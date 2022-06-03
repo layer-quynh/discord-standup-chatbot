@@ -14,7 +14,7 @@ class User(models.Model):
 
 class Post(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     date_create = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
     status = models.TextField()
     id_channel = models.CharField(max_length=18)
