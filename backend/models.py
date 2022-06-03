@@ -4,7 +4,7 @@ from django.db import models
 
 # Create your models here.
 class User(models.Model):
-    id = models.IntegerField(primary_key=True, editable=False)
+    id = models.AutoField(primary_key=True, editable=False)
     discord_user_id = models.CharField(max_length=18)
     user_name = models.TextField(null=True)
 
@@ -12,8 +12,8 @@ class User(models.Model):
         db_table = 'users'
 
 
-class post(models.Model):
-    id = models.IntegerField(primary_key=True, editable=False)
+class Post(models.Model):
+    id = models.AutoField(primary_key=True, editable=False)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     date_create = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
     status = models.TextField()
