@@ -18,10 +18,12 @@ class Post(models.Model):
     date_create = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
     status = models.TextField()
     id_channel = models.CharField(max_length=18)
+    message_id = models.CharField(max_length=18,default='18', editable=False)
     do_yesterday = models.TextField()
     do_today = models.TextField()
     content = models.TextField()
     time_post = models.DateTimeField()
+
 
 
 
