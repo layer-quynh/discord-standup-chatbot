@@ -7,6 +7,7 @@ import aiocron
 from config import TOKEN, SERVER_ID, CHANNEL_ID
 import _thread
 import threading
+from multiprocessing import Process
 
 intents = Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -27,6 +28,7 @@ async def cronjob1():
                 loop = asyncio.get_event_loop()
                 t = threading.Thread(target=loop_function, args=(loop, channel, genesis_channel, mem, ))
                 t.start()
+                print(t.name)
 
                 # await bot.change_presence(status=Status.idle)
                 # await channel.send('Hi! What you did since yesterday?')
@@ -72,9 +74,10 @@ async def send_message(channel, genesis_channel, mem):
     except asyncio.TimeoutError:
         # await channel.send('You ran out of time to answer!')
         return
-    if did_message.author.id != bot.user.id:
+    if did_message.author.id == mem.id:
         if did_message.author == bot.user:
             return
+        channel = bot.get_user(mem.id)
         await channel.send('What will you do today?')
 
         try:
@@ -83,15 +86,15 @@ async def send_message(channel, genesis_channel, mem):
             print(ex)
             return
 
-        # if will_do_message.author.id == mem.id:
-        today = datetime.datetime.now().date().strftime('%d/%m/%Y')
-        mem_id = '<@' + str(mem.id) + '>'
-        report_content = mem_id + " posted an update for Daily Standup in " + \
-                         today + ' : \n' + 'What you did since yesterday: ' + did_message.content + '\n' + \
-                         'What will you do today: ' + will_do_message.content
-        await channel.send("Yay! You sent the report")
-        report = await genesis_channel.send(report_content)
-        # print(report.report_content)
+        if will_do_message.author.id == mem.id:
+            today = datetime.datetime.now().date().strftime('%d/%m/%Y')
+            mem_id = '<@' + str(mem.id) + '>'
+            report_content = mem_id + " posted an update for Daily Standup in " + \
+                             today + ' : \n' + 'What you did since yesterday: ' + did_message.content + '\n' + \
+                             'What will you do today: ' + will_do_message.content
+            await channel.send("Yay! You sent the report")
+            report = await genesis_channel.send(report_content)
+            # print(report.report_content)
 
 
 def between_callback(channel, genesis_channel, mem):
