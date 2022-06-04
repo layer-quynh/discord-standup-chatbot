@@ -49,16 +49,10 @@ class EditPost(GenericAPIView):
     authentication_classes = ()
 
     def get(self, request, message_id):
-        # do_yesterday = Post.objects.filter(
-        #     date_create__gt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T00:00:00.000000Z',
-        #     date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
-        #     user_id=user_id).order_by('-date_create').first()
-        # post_serializer = PostSerializer(instance=do_yesterday)
-        # res = post_serializer.data
-
         html = '''
             <h1>Edit Post</h1>
             <form action="update" method="post">
+              <input type="hidden" name="" id="inputMessageID" value="{}" />
               <p>What did you do yesterday?</p>
               <textarea id="inputYesterday" rows="6" cols="70"></textarea>
               <!-- <input type="text" name="yesterday_name" id="input_yesterday" /> -->
@@ -75,9 +69,8 @@ class EditPost(GenericAPIView):
                 style="width: 200px; height: 50px"
               />
             </form>
-        '''
+        '''.format(message_id)
         return HttpResponse(html)
-
 
 class SaveUser(GenericAPIView):
     authentication_classes = ()
