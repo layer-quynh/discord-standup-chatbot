@@ -11,5 +11,7 @@ urlpatterns = [
     path('user', views.SaveUser.as_view()),
     path('post', views.SavePost.as_view()),
 
+    path('today', views.GetToday.as_view()),
+    path('get-yesterday-post/<int:user_id>', views.GetYesterdayPost.as_view()),
 
 ]

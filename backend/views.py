@@ -21,6 +21,30 @@ class TestView(GenericAPIView):
         return Response({'status': 'OK'})
 
 
+# Lay thoi gian tra ve dung dinh dang
+class GetToday(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request):
+        date_today = datetime.date.today()
+        print(date_today)
+        return Response({'today': str(date_today)})
+
+
+class GetYesterdayPost(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request, user_id):
+        do_yesterday = Post.objects.filter(
+            date_create__gt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T00:00:00.000000Z',
+            date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
+            user_id=user_id).order_by('-date_create').first()
+        post_serializer = PostSerializer(instance=do_yesterday)
+        res = post_serializer.data
+
+        return Response(res['do_today'])
+
+
 class SaveUser(GenericAPIView):
     authentication_classes = ()
 
@@ -45,6 +69,7 @@ class GetUser(GenericAPIView):
         user = User.objects.filter(id=userid).first()
         print(user)
 
+        # convert to json using UserSerializer
         res = UserSerializer(instance=user).data
         return Response(res)
 
