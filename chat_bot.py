@@ -45,7 +45,11 @@ async def cronjob1():
                                          'What will you do today: ' + will_do_message.content
                         await channel.send("Yay! You sent the report")
                         report = await genesis_channel.send(report_content)
-                        print(report.report_content)
+                        print(report)
+                        msg_id = 982489394877452400
+                        message = await genesis_channel.fetch_message(msg_id)
+                        print(message)
+                        await message.edit(content="Update")
 
 
 @bot.event
@@ -58,7 +62,7 @@ async def on_ready():
             #     print(mem.id)
             for channel in guild.channels:
                 # print("Channel: ", channel)
-                if channel.name == 'channel-test':
+                if channel.name == 'team-genesis':
                     print(channel.id)
                     await channel.send('Hello channel')
 
