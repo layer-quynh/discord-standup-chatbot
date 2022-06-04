@@ -38,11 +38,8 @@ class SaveUser(GenericAPIView):
 class GetUser(GenericAPIView):
     authentication_classes = ()
 
-    def get(self, request):
-        param = request.GET
-        userid = param.get("id", None)
-
-        user = User.objects.filter(id=userid).first()
+    def get(self, request, user_id):
+        user = User.objects.filter(id=user_id).first()
         print(user)
 
         res = UserSerializer(instance=user).data
@@ -69,12 +66,20 @@ class SavePost(GenericAPIView):
         return Response(res)
 
 
-class GetPost(GenericAPIView):
+class GetDoYesterday(GenericAPIView):
     authentication_classes = ()
 
     def get(self, request):
-        param = request.GET
-        post_id = param.get("id", None)
+        do_yesterday = Post.objects.filter(datetime='2022-06-04T04:15:08.026265Z').first()
+        print(do_yesterday)
+
+        return Response({'status': 'OK'})
+
+
+class GetPost(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request, post_id):
 
         post = Post.objects.filter(id=post_id).first()
 
