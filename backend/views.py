@@ -270,6 +270,18 @@ class GetUser(GenericAPIView):
         res = UserSerializer(instance=user).data
         return Response(res)
 
+class GetUserFromDiscordUserID(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request,discord_user_id):
+        user = User.objects.filter(discord_user_id=discord_user_id).first()
+        # print(user)
+        if user is None:
+            return Response({'id': None})
+
+        # convert to json using UserSerializer
+        res = UserSerializer(instance=user).data
+        return Response(res)
 
 class SavePost(GenericAPIView):
     authentication_classes = ()

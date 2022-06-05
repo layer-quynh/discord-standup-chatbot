@@ -8,6 +8,8 @@ urlpatterns = [
     path('user-id', views.GetUser.as_view()),
     path('post-id', views.GetPost.as_view()),
 
+    path('user-id/<str:discord_user_id>', views.GetUserFromDiscordUserID.as_view()),
+
     path('user', views.SaveUser.as_view()),
     path('post', views.SavePost.as_view()),
 

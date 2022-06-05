@@ -10,6 +10,11 @@ from config import TOKEN, SERVER_ID, CHANNEL_ID
 import requests
 import json
 
+# Making html
+import webbrowser
+import os
+
+
 intents = Intents.all()
 bot = commands.Bot(command_prefix="#", intents=intents)
 
@@ -141,6 +146,9 @@ async def on_message(message):
         await message.edit(content=msg_content)
         await message.channel.send('Updated')
 
+    if message.content == '#h_cmd':
+        await editPost(str(message.author.id))
+
     await bot.process_commands(message)
 
 
@@ -256,6 +264,114 @@ def save_or_update_post(author, channel, did_message, will_do_message, post_type
 
         return report_content
 
+    return None
+
+async def editPost(author_id):
+    f = open('edit-post.html', 'w')
+    # the html code which will go in the file GFG.html
+
+    backend_url = 'http://127.0.0.1:8000'
+    action_url = backend_url + '/update'
+# search de tra ve user_id
+    res1 = requests.get(backend_url+'/user-id/'+str(author_id))
+    res1 = json.loads(res1.content)
+    userID = res1.get('id')
+
+    print(author_id)
+    res= requests.get(backend_url+'/get-reported-post-today/'+str(userID))
+    res = json.loads(res.content)
+
+    message_id= res.get('message_id',None)
+    do_yesterday = res.get('do_yesterday',None)
+    do_today = res.get('do_today',None)
+
+    html_template = """
+          <style>
+          * {
+            box-sizing: border-box;
+            margin: 0px;
+          }
+          .outside-container {
+            width: 500px;
+            margin: auto;
+            /* border: 1px red solid; */
+            padding: 10px;
+            background-color: rgb(147, 186, 231);
+            border: 5px solid #d3e2f4;
+            border-radius: 5%;
+          }
+          h1 {
+            /* background-color: rgb(171, 131, 235); */
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-align: center;
+          }
+          p {
+            padding: 15px 0 15px 0;
+          }
+          .textarea-container {
+            padding: 0 5px;
+          }
+          textarea {
+            width: 100%;
+            border: 0px;
+            padding: 10px;
+            border-radius: 10px;
+          }
+          input[type="submit"] {
+            display: block;
+            margin: auto;
+            margin-bottom: 15px;
+            width: 200px;
+            height: 50px;
+            border: rgb(255, 224, 168) 3px solid;
+            background-color: orange;
+            border-radius: 10px;
+            color: rgb(68, 3, 3);
+            font-weight: 900;
+          }
+        </style>
+                """ + f"""
+        <div class="outside-container">
+          <h1>Author ID #{author_id}</h1>
+          <h1>Edit Post #{message_id}</h1>
+          <form action="{action_url}" method="post">
+            <input
+              type="hidden"
+              name="message_id"
+              id="inputMessageID"
+              value="{message_id}"
+            />
+            <p>What did you do yesterday?</p>
+            <div class="textarea-container">
+              <textarea name="do_yesterday" id="inputYesterday" rows="6">{do_yesterday}</textarea>
+            </div>
+
+            <p>What will you do today?</p>
+
+            <div class="textarea-container">
+              <textarea name="do_today" id="inputToday" rows="6">{do_today}</textarea
+              >
+            </div>
+
+            <br />
+            <br />
+            <input
+              type="submit"
+              value="Confirm Edit"
+              style="width: 200px; height: 50px"
+            />
+          </form>
+        </div>
+        """
+    # writing the code into the file
+    f.write(html_template)
+    # close the file
+    f.close()
+    # 1st method how to open html files in chrome using
+    filename = 'file:///' + os.getcwd() + '/' + 'edit-post.html'
+    # webbrowser.open_new_tab(filename)
+    webbrowser.open(filename,new=1,autoraise=True)
     return None
 
 
