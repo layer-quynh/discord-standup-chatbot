@@ -14,7 +14,7 @@ intents = Intents.all()
 bot = commands.Bot(command_prefix="#", intents=intents)
 
 
-@aiocron.crontab('3 19 * * *')
+@aiocron.crontab('23 20 * * *')
 async def cronjob1():
     for guild in bot.guilds:
         if guild.id == SERVER_ID:
@@ -110,8 +110,8 @@ async def standup():
 
                             if will_do_message.author.id == mem.id:
                                 report_content = mem_id + " posted an update for Daily Standup in " + \
-                                                 today + ' : \n' + 'What you did since yesterday: ' + did_message.content + '\n' + \
-                                                 'What will you do today: ' + will_do_message.content
+                                                 today + ' : \n' + 'What you did since yesterday: \n' + did_message.content + '\n' + \
+                                                 'What will you do today: \n' + will_do_message.content
                                 message = await genesis_channel.send(report_content)
                                 print(message)
                                 await channel.send("Yay! You sent the report")
@@ -166,7 +166,7 @@ async def standup_tomorrow():
                             # await channel.send('You ran out of time to answer!')
                             return
                         if did_message.author.id == mem.id:
-                            await channel.send('What will you do today?')
+                            await channel.send('What will you do tomorrow?')
 
                             try:
                                 will_do_message = await bot.wait_for('message', timeout=60, check=check)
@@ -176,8 +176,8 @@ async def standup_tomorrow():
 
                             if will_do_message.author.id == mem.id:
                                 report_content = mem_id + " posted an update for Daily Standup in " + \
-                                                 tomorrow + ' : \n' + 'What you did since yesterday: ' + did_message.content + '\n' + \
-                                                 'What will you do today: ' + will_do_message.content
+                                                 tomorrow + ' : \n' + 'What you did since yesterday: \n' + did_message.content + '\n' + \
+                                                 'What will you do today: \n' + will_do_message.content
                                 # message = await genesis_channel.send(report_content)
                                 # print(message)
                                 await channel.send("Yay! Your report is recorded")
@@ -228,10 +228,10 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.content == '#standup':
+    if message.content == 'standup':
         await standup()
 
-    if message.content == '#standup_tm':
+    if message.content == 'standup_tm':
         await standup_tomorrow()
 
     # if message.content == 'hello':
@@ -358,8 +358,8 @@ def save_or_update_post(author, channel, did_message, will_do_message, content=N
                 will_do_message = tomorrow_post_res.get('do_today', '')
 
             report_content = mem_id + " posted an update for Daily Standup in " + \
-                             tomorrow + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
-                             'What will you do today: ' + will_do_message
+                             tomorrow + ' : \n' + 'What you did since yesterday: \n' + did_message + '\n' + \
+                             'What will you do today: \n' + will_do_message
 
             message_id = tomorrow_post_res.get('message_id')
 
@@ -377,8 +377,8 @@ def save_or_update_post(author, channel, did_message, will_do_message, content=N
 
             if content is None:
                 content = mem_id + " posted an update for Daily Standup in " + \
-                                 tomorrow + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
-                                 'What will you do today: ' + will_do_message
+                                 tomorrow + ' : \n' + 'What you did since yesterday: \n' + did_message + '\n' + \
+                                 'What will you do today: \n' + will_do_message
 
             data = {'user_id': user_id, 'status': 'for_tomorrow', 'id_channel': str(channel.id),
                     'do_yesterday': did_message,
