@@ -75,7 +75,9 @@ class EditPost(GenericAPIView):
 class EditMessage(GenericAPIView):
     authentication_classes = ()
 
-    def patch(self, request):
+    def patch(self, request, message_id):
+        body = request.body
+        body = body.decode('utf-8')
         body = json.loads(request.body)
         message_id = body.get("message_id", None)
         content = body.get("content", None)
@@ -92,16 +94,41 @@ class UpdateMessage(GenericAPIView):
     authentication_classes = ()
 
     def post(self,request):
-        print('#############################')
-        print(request)
-        abc = request.body
-        body = json.loads(request.body)
-        print(str(abc))
-        print(type(abc))
-        print(type(str(abc)))
+        body = request.body
+        body = body.decode('utf-8')
+
+        message_id = None
+        do_yesterday = None
+        do_today = None
+
+        key_val = body.split('&')
+        for item in key_val:
+            item_key_val = item.split('=')
+            print(item_key_val)
+            if item_key_val[0] == 'message_id':
+                message_id = item_key_val[1]
+
+            if item_key_val[0] == 'do_yesterday':
+                do_yesterday = item_key_val[1]
+
+            if item_key_val[0] == 'do_today':
+                do_today = item_key_val[1]
+
+        print(message_id)
+        print(do_today)
+        print(do_yesterday)
+        # body = json.loads(body)
+        # print(body)
         # body = json.loads(request.body)
-        # message_id = body.get("message_id", None)
-        # print(message_id)
+        # print(body)
+        # abc = request.body
+        # body = json.loads(request.body)
+        # print(str(abc))
+        # print(type(abc))
+        # print(type(str(abc)))
+        # # body = json.loads(request.body)
+        # # message_id = body.get("message_id", None)
+        # # print(message_id)
         return HttpResponse('<h1>ok</h1>')
 
 class SaveUser(GenericAPIView):
