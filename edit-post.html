@@ -1,0 +1,79 @@
+
+          <style>
+          * {
+            box-sizing: border-box;
+            margin: 0px;
+          }
+          .outside-container {
+            width: 500px;
+            margin: auto;
+            /* border: 1px red solid; */
+            padding: 10px;
+            background-color: rgb(147, 186, 231);
+            border: 5px solid #d3e2f4;
+            border-radius: 5%;
+          }
+          h1 {
+            /* background-color: rgb(171, 131, 235); */
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-align: center;
+          }
+          p {
+            padding: 15px 0 15px 0;
+          }
+          .textarea-container {
+            padding: 0 5px;
+          }
+          textarea {
+            width: 100%;
+            border: 0px;
+            padding: 10px;
+            border-radius: 10px;
+          }
+          input[type="submit"] {
+            display: block;
+            margin: auto;
+            margin-bottom: 15px;
+            width: 200px;
+            height: 50px;
+            border: rgb(255, 224, 168) 3px solid;
+            background-color: orange;
+            border-radius: 10px;
+            color: rgb(68, 3, 3);
+            font-weight: 900;
+          }
+        </style>
+                
+        <div class="outside-container">
+          <h1>Author ID #921657121102250065</h1>
+          <h1>Edit Post #24</h1>
+          <form action="http://127.0.0.1:8000/update" method="post">
+            <input
+              type="hidden"
+              name="message_id"
+              id="inputMessageID"
+              value="24"
+            />
+            <p>What did you do yesterday?</p>
+            <div class="textarea-container">
+              <textarea name="do_yesterday" id="inputYesterday" rows="6">TTTTTTTTTTTT</textarea>
+            </div>
+
+            <p>What will you do today?</p>
+
+            <div class="textarea-container">
+              <textarea name="do_today" id="inputToday" rows="6">TTTTTTTTTTTTTTTTT</textarea
+              >
+            </div>
+
+            <br />
+            <br />
+            <input
+              type="submit"
+              value="Confirm Edit"
+              style="width: 200px; height: 50px"
+            />
+          </form>
+        </div>
+        

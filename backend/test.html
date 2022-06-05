@@ -7,24 +7,40 @@
     <title>Edit Post</title>
   </head>
   <body>
-    <h1>Edit Post</h1>
-    <form action="update" method="post">
-      <input type="hidden" name="" id="inputMessageID" value="" />
-      <p>What did you do yesterday?</p>
-      <textarea id="inputYesterday" rows="6" cols="70"></textarea>
-      <!-- <input type="text" name="yesterday_name" id="input_yesterday" /> -->
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0px;
+      }
+      h1 {
+        background-color: rgb(121, 60, 218);
+      }
+      .outside-container {
+        width: 500px;
+        margin: auto;
+        border: 1px red solid;
+      }
+    </style>
+    <div class="outside-container">
+      <h1>Edit Post</h1>
+      <form action="http://http://127.0.0.1:8000/update" method="patch">
+        <input type="hidden" name="" id="inputMessageID" value="" />
+        <p>What did you do yesterday?</p>
+        <textarea id="inputYesterday" rows="6" cols="auto"></textarea>
+        <!-- <input type="text" name="yesterday_name" id="input_yesterday" /> -->
 
-      <p>What will you do today?</p>
+        <p>What will you do today?</p>
 
-      <!-- <input type="text" name="today_name" id="input_today" /> -->
-      <textarea id="inputToday" rows="6" cols="70"></textarea>
-      <br />
-      <br />
-      <input
-        type="submit"
-        value="Confirm Edit"
-        style="width: 200px; height: 50px"
-      />
-    </form>
+        <!-- <input type="text" name="today_name" id="input_today" /> -->
+        <textarea id="inputToday" rows="6"></textarea>
+        <br />
+        <br />
+        <input
+          type="submit"
+          value="Confirm Edit"
+          style="width: 200px; height: 50px"
+        />
+      </form>
+    </div>
   </body>
 </html>

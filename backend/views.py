@@ -126,19 +126,42 @@ class PostView(GenericAPIView):
 class EditPost(GenericAPIView):
     authentication_classes = ()
 
-    def get(self, request, message_id):
+    def post(self, request, message_id):
+        body = request.body
+        body = body.decode('utf-8')
+
+        # body = json.loads(request.body)
+        # do_yesterday = body.get("do_yesterday", None)
+        # do_today = body.get("do_today", None)
+
+        # message_id = None
+        do_yesterday = None
+        do_today = None
+
+        key_val = body.split('&')
+        for item in key_val:
+            item_key_val = item.split('=')
+            print(item_key_val)
+            # if item_key_val[0] == 'message_id':
+            #     message_id = item_key_val[1]
+
+            if item_key_val[0] == 'do_yesterday':
+                do_yesterday = item_key_val[1]
+
+            if item_key_val[0] == 'do_today':
+                do_today = item_key_val[1]
         html = '''
             <h1>Edit Post</h1>
-            <form action="update" method="post">
-              <input type="hidden" name="" id="inputMessageID" value="{}" />
+            <form action="../update" method="post">
+              <input type="hidden" name="message_id" id="inputMessageID" value="{}" />
               <p>What did you do yesterday?</p>
-              <textarea id="inputYesterday" rows="6" cols="70"></textarea>
+              <textarea name="do_yesterday" id="inputYesterday" rows="6" cols="70">{}</textarea>
               <!-- <input type="text" name="yesterday_name" id="input_yesterday" /> -->
         
               <p>What will you do today?</p>
         
               <!-- <input type="text" name="today_name" id="input_today" /> -->
-              <textarea id="inputToday" rows="6" cols="70"></textarea>
+              <textarea name="do_today" id="inputToday" rows="6" cols="70">{}</textarea>
               <br />
               <br />
               <input
@@ -147,8 +170,86 @@ class EditPost(GenericAPIView):
                 style="width: 200px; height: 50px"
               />
             </form>
-        '''.format(message_id)
+        '''.format(message_id,do_yesterday,do_today)
         return HttpResponse(html)
+
+class EditMessage(GenericAPIView):
+    authentication_classes = ()
+
+    def patch(self, request, message_id):
+        body = request.body
+        body = body.decode('utf-8')
+        body = json.loads(request.body)
+        message_id = body.get("message_id", None)
+        content = body.get("content", None)
+        doYesterday = body.get("do_yesterday", None)
+        doToday = body.get("do_today", None)
+        post = Post.objects.filter(message_id=message_id).first()
+        post.content = content
+        post.save()
+        post_serializer = PostSerializer(instance=post)
+        res = post_serializer.data
+        return Response(res)
+
+class UpdateMessage(GenericAPIView):
+    authentication_classes = ()
+
+    def post(self,request):
+        body = request.body
+        body = body.decode('utf-8')
+
+        message_id = None
+        do_yesterday = None
+        do_today = None
+
+        key_val = body.split('&')
+        for item in key_val:
+            item_key_val = item.split('=')
+            print(item_key_val)
+            if item_key_val[0] == 'message_id':
+                message_id = item_key_val[1]
+
+            if item_key_val[0] == 'do_yesterday':
+                do_yesterday = item_key_val[1]
+
+            if item_key_val[0] == 'do_today':
+                do_today = item_key_val[1]
+
+        print(message_id)
+        print(do_today)
+        print(do_yesterday)
+        # body = json.loads(body)
+        # print(body)
+        # body = json.loads(request.body)
+        # print(body)
+        # abc = request.body
+        # body = json.loads(request.body)
+        # print(str(abc))
+        # print(type(abc))
+        # print(type(str(abc)))
+        # # body = json.loads(request.body)
+        # # message_id = body.get("message_id", None)
+        # # print(message_id)
+        # html = '''
+        #     <p>{}</p>
+        #     <p>{}</p>
+        #     <p>{}</p>
+        # '''.format(message_id,do_today,do_yesterday)
+        # return HttpResponse(html)
+        try:
+            post = Post.objects.filter(message_id=message_id).first()
+            # post.content = content
+            post.do_today=do_today
+            post.do_yesterday = do_yesterday
+            post.save()
+        except:
+            return HttpResponse('Error')
+
+        return HttpResponse('success')
+        #
+        # post_serializer = PostSerializer(instance=post)
+        # res = post_serializer.data
+        # return Response(res)
 
 
 class SaveUser(GenericAPIView):
@@ -181,6 +282,18 @@ class GetUser(GenericAPIView):
         res = UserSerializer(instance=user).data
         return Response(res)
 
+class GetUserFromDiscordUserID(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request,discord_user_id):
+        user = User.objects.filter(discord_user_id=discord_user_id).first()
+        # print(user)
+        if user is None:
+            return Response({'id': None})
+
+        # convert to json using UserSerializer
+        res = UserSerializer(instance=user).data
+        return Response(res)
 
 class SavePost(GenericAPIView):
     authentication_classes = ()
