@@ -1,6 +1,8 @@
 import asyncio
 import datetime
 
+import pyautogui
+import pyperclip
 from discord.ext import commands, tasks
 from discord import Client, Status, Intents, Guild
 import aiocron
@@ -105,11 +107,34 @@ async def on_message(message):
         string = 'Hi ' + message.author.name
         await message.channel.send(string)
 
+    # if message.content == '#edit-td':
+
     if message.content == 'bye':
         string = 'Goodbye ' + message.author.name
         await message.channel.send(string)
 
     await bot.process_commands(message)
+
+
+@bot.command(pass_context=True)
+async def edit(ctx, *, arg):
+    author = ctx.author
+    channel = ctx.channel
+    if arg == 'td':
+        report_content = save_or_update_post(author, channel, None, arg)
+        if report_content is None:
+            result = "Standup today does not exits"
+        result = str(report_content)
+
+    if arg == 'tm':
+        report_content = save_or_update_post(author, channel, None, arg)
+        if report_content is None:
+            result = "Standup today does not exits"
+        result = str(report_content)
+
+    pyperclip.copy(result)
+    pyperclip.paste()
+    pyautogui.hotkey('ctrl', 'v')
 
 
 @bot.command(pass_context=True)
@@ -182,7 +207,8 @@ def save_or_update_post(author, channel, did_message, will_do_message):
                              tomorrow + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
                              'What will you do today: ' + will_do_message
 
-            data = {'user_id': user_id, 'status': 'for_tomorrow', 'id_channel': str(channel.id), 'do_yesterday': did_message,
+            data = {'user_id': user_id, 'status': 'for_tomorrow', 'id_channel': str(channel.id),
+                    'do_yesterday': did_message,
                     'do_today': will_do_message, 'content': report_content, 'time_post': str(datetime.datetime.now())}
             post_url = 'http://127.0.0.1:8000/post'
             requests.post(url=post_url, json=data)
