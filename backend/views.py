@@ -38,11 +38,59 @@ class GetYesterdayPost(GenericAPIView):
         do_yesterday = Post.objects.filter(
             date_create__gt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T00:00:00.000000Z',
             date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
-            user_id=user_id).order_by('-date_create').first()
+            user_id=user_id).exclude(status='for_tomorrow').order_by('-date_create').first()
         post_serializer = PostSerializer(instance=do_yesterday)
         res = post_serializer.data
 
         return Response(res['do_today'])
+
+
+class GetTodayPost(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request, user_id):
+        do_today = Post.objects.filter(
+            date_create__gt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T00:00:00.000000Z',
+            date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
+            user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
+        # do_today = Post.objects.filter(user_id=user_id).order_by('-date_create').first()
+        if do_today is None:
+            return Response({'id': None})
+        post_serializer = PostSerializer(instance=do_today)
+        res = post_serializer.data
+
+        return Response(res)
+
+
+class GetTomorrowPost(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request, user_id):
+        post_tomorrow = Post.objects.filter(
+            date_create__gt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T00:00:00.000000Z',
+            date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
+            user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
+        # do_today = Post.objects.filter(id=1).first()
+        if post_tomorrow is None:
+            return Response({'id': None})
+        post_serializer = PostSerializer(instance=post_tomorrow)
+        res = post_serializer.data
+
+        return Response(res)
+
+
+class PostView(GenericAPIView):
+    authentication_classes = ()
+
+    def put(self, request, post_id):
+        body = json.loads(request.body)
+        post = Post.objects.filter(id=post_id).first()
+
+        post_serializer = PostSerializer(instance=post, data=body, partial=True)
+        post_serializer.is_valid(raise_exception=True)
+        post_serializer.save()
+
+        return Response(post_serializer.data)
 
 
 class EditPost(GenericAPIView):
@@ -72,6 +120,7 @@ class EditPost(GenericAPIView):
         '''.format(message_id)
         return HttpResponse(html)
 
+
 class SaveUser(GenericAPIView):
     authentication_classes = ()
 
@@ -91,10 +140,12 @@ class GetUser(GenericAPIView):
 
     def get(self, request):
         param = request.GET
-        userid = param.get("id", None)
+        discord_user_id = param.get("discord_user_id", None)
 
-        user = User.objects.filter(id=userid).first()
-        print(user)
+        user = User.objects.filter(discord_user_id=discord_user_id).first()
+        # print(user)
+        if user is None:
+            return Response({'id': None})
 
         # convert to json using UserSerializer
         res = UserSerializer(instance=user).data
@@ -106,6 +157,7 @@ class SavePost(GenericAPIView):
 
     def post(self, request):
         body = json.loads(request.body)
+        print(body)
         user_id = body.get("user_id", None)
         status = body.get("status", None)
         id_channel = body.get("id_channel", None)
