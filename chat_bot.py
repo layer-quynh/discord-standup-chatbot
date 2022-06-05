@@ -150,10 +150,10 @@ async def on_message(message):
         await msg.edit(content=msg_content)
         await message.channel.send('Updated')
 
-    if message.content == 'edit-ui':
+    if message.content == 'edit td -ui':
         await editPost(str(message.author.id))
 
-    if message.content == 'edit-tm-ui':
+    if message.content == 'edit tm -ui':
         await editTomorrowPost(str(message.author.id))
 
     await bot.process_commands(message)
@@ -381,7 +381,7 @@ async def editPost(author_id):
     # 1st method how to open html files in chrome using
     filename = 'file:///' + os.getcwd() + '/' + 'edit-post.html'
     # webbrowser.open_new_tab(filename)
-    webbrowser.open(filename,new=1,autoraise=True)
+    webbrowser.open(filename,new=2,autoraise=True)
     return None
 
 async def editTomorrowPost(author_id):
@@ -498,7 +498,7 @@ async def editTomorrowPost(author_id):
     f.close()
     # 1st method how to open html files in chrome using
     filename = 'file:///' + os.getcwd() + '/' + 'edit-tomorrow-post.html'
-    webbrowser.open(filename,new=1,autoraise=True)
+    webbrowser.open(filename,new=2,autoraise=True)
     return None
 
 
