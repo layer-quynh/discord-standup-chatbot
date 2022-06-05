@@ -79,6 +79,24 @@ class GetTomorrowPost(GenericAPIView):
         return Response(res)
 
 
+class GetReportedPost(GenericAPIView):
+    authentication_classes = ()
+
+    def get(self, request, user_id):
+        post_tomorrow = Post.objects.filter(
+            date_create__gt=str(datetime.date.today()) + 'T00:00:00.000000Z',
+            date_create__lt=str(datetime.date.today()) + 'T23:59:59.000000Z',
+            user_id=user_id).exclude(status='for_tomorrow').order_by('-date_create').first()
+        print(post_tomorrow)
+        # do_today = Post.objects.filter(id=1).first()
+        if post_tomorrow is None:
+            return Response({'id': None})
+        post_serializer = PostSerializer(instance=post_tomorrow)
+        res = post_serializer.data
+
+        return Response(res)
+
+
 class PostView(GenericAPIView):
     authentication_classes = ()
 

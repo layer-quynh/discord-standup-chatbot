@@ -9,3 +9,4 @@ discord
 aiocron
 pyperclip
 pyautogui
+discord-webhook
