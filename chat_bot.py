@@ -396,12 +396,22 @@ async def editTomorrowPost(author_id):
     userID = res1.get('id')
 
     print(author_id)
-    res= requests.get(backend_url+'/get-reported-post-today/'+str(userID))
+    res= requests.get(backend_url+'/get-tomorrow-post/'+str(userID))
     res = json.loads(res.content)
 
     message_id= res.get('message_id',None)
     do_yesterday = res.get('do_yesterday',None)
     do_today = res.get('do_today',None)
+
+    if message_id is None:
+        print('No tomorrow standup post')
+        # user_to_level_up = bot.fetch_user(author_id)  # since your user variable is an ID
+        # dm_channel = user_to_level_up.dm_channel
+        # if dm_channel is None:
+        #     await user_to_level_up.create_dm()
+        #     dm_channel = user_to_level_up.dm_channel
+        # await dm_channel.send('You have not create standup for tomorrow')
+        return None
 
     html_template = """
           <style>
@@ -460,12 +470,12 @@ async def editTomorrowPost(author_id):
               id="inputMessageID"
               value="{message_id}"
             />
-            <p>What did you do yesterday?</p>
+            <p>What will be finished today?</p>
             <div class="textarea-container">
               <textarea name="do_yesterday" id="inputYesterday" rows="6">{do_yesterday}</textarea>
             </div>
 
-            <p>What will you do today?</p>
+            <p>What will you do tomorrow?</p>
 
             <div class="textarea-container">
               <textarea name="do_today" id="inputToday" rows="6">{do_today}</textarea
