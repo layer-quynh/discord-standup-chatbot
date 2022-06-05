@@ -6,7 +6,7 @@ import pyperclip
 from discord.ext import commands, tasks
 from discord import Client, Status, Intents, Guild
 import aiocron
-from config import TOKEN, SERVER_ID, CHANNEL_ID
+from config import TOKEN, SERVER_ID, CHANNEL_ID, DISCORD_USER_ID
 import requests
 import json
 
@@ -20,6 +20,9 @@ async def cronjob1():
         if guild.id == SERVER_ID:
             for mem in guild.members:
                 if mem.bot:
+                    continue
+
+                if mem.id != DISCORD_USER_ID:
                     continue
                 channel = bot.get_user(mem.id)
                 genesis_channel = bot.get_channel(CHANNEL_ID)
@@ -35,7 +38,6 @@ async def cronjob1():
                     today = datetime.datetime.now().date().strftime('%d/%m/%Y')
                     mem_id = '<@' + str(mem.id) + '>'
                     if get_today_post_res.get('id', None) is not None:
-                        print(get_today_post_res)
                         content = get_today_post_res.get('content', None)
                         do_today = get_today_post_res.get('do_today', '')
                         do_yesterday = get_today_post_res.get('do_yesterday', '')
@@ -43,13 +45,9 @@ async def cronjob1():
                         if content is not None:
                             # report_content = mem_id + " posted an update for Daily Standup in " + \
                             #                  today + ' : \n' + content
-                            await genesis_channel.send(content)
-                            data = {'user_id': user_id, 'status': 'done', 'id_channel': str(channel.id),
-                                    'do_yesterday': do_yesterday,
-                                    'do_today': do_today, 'content': content,
-                                    'time_post': str(datetime.datetime.now())}
-                            post_url = 'http://127.0.0.1:8000/post'
-                            requests.post(url=post_url, json=data)
+                            message = await genesis_channel.send(content)
+
+                            save_new_report(user_id, channel, do_yesterday, do_today, content, message)
                     else:
                         # await bot.change_presence(status=Status.idle)
                         await channel.send('Hi! What you did since yesterday?')
@@ -73,18 +71,24 @@ async def cronjob1():
                                 return
 
                             if will_do_message.author.id == mem.id:
-                                # today = datetime.datetime.now().date().strftime('%d/%m/%Y')
-                                # mem_id = '<@' + str(mem.id) + '>'
                                 report_content = mem_id + " posted an update for Daily Standup in " + \
                                                  today + ' : \n' + 'What you did since yesterday: ' + did_message.content + '\n' + \
                                                  'What will you do today: ' + will_do_message.content
+                                message = await genesis_channel.send(report_content)
+                                print(message)
                                 await channel.send("Yay! You sent the report")
-                                report = await genesis_channel.send(report_content)
-                                print(report)
-                                # msg_id = 982489394877452400
-                                # message = await genesis_channel.fetch_message(msg_id)
-                                # print(message)
-                                # await message.edit(content="Update")
+                                save_new_report(user_id, channel, did_message, will_do_message, report_content, message)
+
+
+def save_new_report(user_id, channel, did_message, will_do_message, report_content, report):
+    print('Report id: ', report.id)
+    data = {'user_id': user_id, 'status': 'done', 'id_channel': str(channel.id),
+            'do_yesterday': did_message,
+            'do_today': will_do_message, 'content': report_content,
+            'message_id': str(report.id),
+            'time_post': str(datetime.datetime.now())}
+    post_url = 'http://127.0.0.1:8000/post'
+    requests.post(url=post_url, json=data)
 
 
 @bot.event
@@ -127,18 +131,18 @@ async def on_message(message):
 
     if message.content.startswith('edit_did'):
         content = message.content.split(' ', 1)
-        msg_content = save_or_update_post(message.author, message.channel, content[1], None, post_type='get-reported-post-today')
+        msg_content, msg_id = save_or_update_post(message.author, message.channel, content[1], None, post_type='get-reported-post-today')
         genesis_channel = bot.get_channel(CHANNEL_ID)
-        message = await genesis_channel.fetch_message(message.id)
-        await message.edit(content=msg_content)
+        msg = await genesis_channel.fetch_message(int(msg_id))
+        await msg.edit(content=msg_content)
         await message.channel.send('Updated')
 
     if message.content.startswith('edit_will'):
         content = message.content.split(' ', 1)
-        msg_content = save_or_update_post(message.author, message.channel, content[1], None, post_type='get-reported-post-today')
+        msg_content, msg_id = save_or_update_post(message.author, message.channel, None, content[1], post_type='get-reported-post-today')
         genesis_channel = bot.get_channel(CHANNEL_ID)
-        message = await genesis_channel.fetch_message(message.id)
-        await message.edit(content=msg_content)
+        msg = await genesis_channel.fetch_message(int(msg_id))
+        await msg.edit(content=msg_content)
         await message.channel.send('Updated')
 
     await bot.process_commands(message)
@@ -158,7 +162,6 @@ async def edit(ctx, *, arg):
     do_today = ''
 
     if user_id is not None:
-        user_id = 4
         reported_url = 'http://127.0.0.1:8000/get-reported-post-today/' + str(user_id)
         reported_res = requests.get(url=reported_url)
         reported_res = json.loads(reported_res.content)
@@ -183,7 +186,7 @@ async def td(ctx, *, arg):
     author = ctx.author
     channel = ctx.channel
 
-    report_content = save_or_update_post(author, channel, arg, None)
+    report_content , _= save_or_update_post(author, channel, arg, None)
     message = 'Yay! This is your report looks like for tomorrow: \n' + report_content
 
     await ctx.send(message)
@@ -193,7 +196,7 @@ async def td(ctx, *, arg):
 async def twd(ctx, *, arg):
     author = ctx.author
     channel = ctx.channel
-    report_content = save_or_update_post(author, channel, None, arg)
+    report_content, _ = save_or_update_post(author, channel, None, arg)
     message = 'Yay! This is your report looks like for tomorrow: \n' + report_content
 
     await ctx.send(message)
@@ -235,6 +238,8 @@ def save_or_update_post(author, channel, did_message, will_do_message, post_type
                              tomorrow + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
                              'What will you do today: ' + will_do_message
 
+            message_id = tomorrow_post_res.get('message_id')
+
             data['content'] = report_content
             requests.put(url=update_post_url, json=data)
         else:
@@ -252,9 +257,11 @@ def save_or_update_post(author, channel, did_message, will_do_message, post_type
                     'do_yesterday': did_message,
                     'do_today': will_do_message, 'content': report_content, 'time_post': str(datetime.datetime.now())}
             post_url = 'http://127.0.0.1:8000/post'
-            requests.post(url=post_url, json=data)
+            post_res = requests.post(url=post_url, json=data)
+            post_res = json.loads(post_res.content)
+            message_id = post_res.get('message_id')
 
-        return report_content
+        return report_content, message_id
 
     return None
 
