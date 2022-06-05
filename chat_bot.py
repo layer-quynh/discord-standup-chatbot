@@ -149,12 +149,12 @@ async def standup_tomorrow():
                         if content is not None:
                             # report_content = mem_id + " posted an update for Daily Standup in " + \
                             #                  today + ' : \n' + content
-                            message = await genesis_channel.send(content)
+                            # message = await genesis_channel.send(content)
 
-                            save_new_report(user_id, channel, do_yesterday, do_today, content, message)
+                            save_new_report(user_id, channel, do_yesterday, do_today, content, None)
                     else:
                         # await bot.change_presence(status=Status.idle)
-                        await channel.send('This is standup for tomorrow! What you did since yesterday?')
+                        await channel.send('This is standup for tomorrow! What will be finished today?')
 
                         def check(m):
                             return m.content not in ['#edit did', '#edit will', 'edit_td', 'edit_tm']
@@ -228,10 +228,10 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.content == 'standup':
+    if message.content == '#standup':
         await standup()
 
-    if message.content == 'standup_tm':
+    if message.content == '#standup_tm':
         await standup_tomorrow()
 
     # if message.content == 'hello':
@@ -257,9 +257,9 @@ async def on_message(message):
         # content = message.content.split(' ', 1)
         content = message.content
         msg_content, msg_id = save_or_update_post(message.author, message.channel, None, None, content=content, post_type='get-tomorrow-post')
-        genesis_channel = bot.get_channel(CHANNEL_ID)
-        msg = await genesis_channel.fetch_message(int(msg_id))
-        await msg.edit(content=msg_content)
+        # genesis_channel = bot.get_channel(CHANNEL_ID)
+        # msg = await genesis_channel.fetch_message(int(msg_id))
+        # await msg.edit(content=msg_content)
         await message.channel.send('Updated')
 
     await bot.process_commands(message)

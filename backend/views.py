@@ -49,15 +49,15 @@ class GetTodayPost(GenericAPIView):
     authentication_classes = ()
 
     def get(self, request, user_id):
-        # do_today = Post.objects.filter(
-        #     date_create__gt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T00:00:00.000000Z',
-        #     date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
-        #     user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
+        do_today = Post.objects.filter(
+            date_create__gt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T00:00:00.000000Z',
+            date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
+            user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
         # do_today = Post.objects.filter(
         #     date_create__gt=str(datetime.datetime.now() - datetime.timedelta(minutes=1)),
         #     date_create__lt=str(datetime.datetime.now()),
         #     user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
-        do_today = Post.objects.filter(user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
+        # do_today = Post.objects.filter(user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
         if do_today is None:
             return Response({'id': None})
         post_serializer = PostSerializer(instance=do_today)
