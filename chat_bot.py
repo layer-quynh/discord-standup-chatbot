@@ -146,7 +146,8 @@ def save_or_update_post(author, channel, did_message, will_do_message):
         tomorrow_post_res = requests.get(url=tomorrow_post_url)
         tomorrow_post_res = json.loads(tomorrow_post_res.content)
         tomorrow_post_id = tomorrow_post_res.get('id', None)
-        today = datetime.datetime.now().date().strftime('%d/%m/%Y')
+        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+        tomorrow = tomorrow.strftime('%d/%m/%Y')
         mem_id = '<@' + str(author_id) + '>'
         # report_content = mem_id + " posted an update for Daily Standup in " + \
         #                  today + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
@@ -165,7 +166,7 @@ def save_or_update_post(author, channel, did_message, will_do_message):
                 will_do_message = tomorrow_post_res.get('do_today', '')
 
             report_content = mem_id + " posted an update for Daily Standup in " + \
-                             today + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
+                             tomorrow + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
                              'What will you do today: ' + will_do_message
 
             data['content'] = report_content
@@ -178,7 +179,7 @@ def save_or_update_post(author, channel, did_message, will_do_message):
                 will_do_message = ''
 
             report_content = mem_id + " posted an update for Daily Standup in " + \
-                             today + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
+                             tomorrow + ' : \n' + 'What you did since yesterday: ' + did_message + '\n' + \
                              'What will you do today: ' + will_do_message
 
             data = {'user_id': user_id, 'status': 'for_tomorrow', 'id_channel': str(channel.id), 'do_yesterday': did_message,
