@@ -7,3 +7,6 @@ djangorestframework
 mysqlclient
 discord
 aiocron
+pyperclip
+pyautogui
+discord-webhook
