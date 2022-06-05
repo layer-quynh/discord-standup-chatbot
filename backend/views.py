@@ -53,11 +53,11 @@ class GetTodayPost(GenericAPIView):
         #     date_create__gt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T00:00:00.000000Z',
         #     date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
         #     user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
-        do_today = Post.objects.filter(
-            date_create__gt=str(datetime.datetime.now() - datetime.timedelta(minutes=1)),
-            date_create__lt=str(datetime.datetime.now()),
-            user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
-        # do_today = Post.objects.filter(user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
+        # do_today = Post.objects.filter(
+        #     date_create__gt=str(datetime.datetime.now() - datetime.timedelta(minutes=1)),
+        #     date_create__lt=str(datetime.datetime.now()),
+        #     user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
+        do_today = Post.objects.filter(user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
         if do_today is None:
             return Response({'id': None})
         post_serializer = PostSerializer(instance=do_today)
@@ -75,11 +75,9 @@ class GetTomorrowPost(GenericAPIView):
         #     date_create__lt=str(datetime.date.today() - datetime.timedelta(days=1)) + 'T23:59:59.000000Z',
         #     user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
         post_tomorrow = Post.objects.filter(
-            date_create__gt=str(datetime.datetime.now() - datetime.timedelta(minutes=1)),
-            date_create__lt=str(datetime.datetime.now()),
+            date_create__gt=str(datetime.date.today()) + 'T00:00:00.000000Z',
+            date_create__lt=str(datetime.date.today()) + 'T23:59:59.000000Z',
             user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
-        # post_tomorrow = Post.objects.filter(user_id=user_id, status='for_tomorrow').order_by('-date_create').first()
-        # do_today = Post.objects.filter(id=1).first()
         print(post_tomorrow)
         if post_tomorrow is None:
             return Response({'id': None})
@@ -114,9 +112,13 @@ class PostView(GenericAPIView):
         body = json.loads(request.body)
         post = Post.objects.filter(id=post_id).first()
 
-        post_serializer = PostSerializer(instance=post, data=body, partial=True)
-        post_serializer.is_valid(raise_exception=True)
-        post_serializer.save()
+        try:
+            print(body)
+            post_serializer = PostSerializer(instance=post, data=body, partial=True)
+            post_serializer.is_valid(raise_exception=True)
+            post_serializer.save()
+        except Exception as ex:
+            print(ex)
 
         return Response(post_serializer.data)
 
