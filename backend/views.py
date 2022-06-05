@@ -51,16 +51,16 @@ class EditPost(GenericAPIView):
     def get(self, request, message_id):
         html = '''
             <h1>Edit Post</h1>
-            <form action="update" method="post">
-              <input type="hidden" name="" id="inputMessageID" value="{}" />
+            <form action="../update" method="post">
+              <input type="hidden" name="message_id" id="inputMessageID" value="{}" />
               <p>What did you do yesterday?</p>
-              <textarea id="inputYesterday" rows="6" cols="70"></textarea>
+              <textarea name="do_yesterday" id="inputYesterday" rows="6" cols="70"></textarea>
               <!-- <input type="text" name="yesterday_name" id="input_yesterday" /> -->
         
               <p>What will you do today?</p>
         
               <!-- <input type="text" name="today_name" id="input_today" /> -->
-              <textarea id="inputToday" rows="6" cols="70"></textarea>
+              <textarea name="do_today" id="inputToday" rows="6" cols="70"></textarea>
               <br />
               <br />
               <input
@@ -71,6 +71,38 @@ class EditPost(GenericAPIView):
             </form>
         '''.format(message_id)
         return HttpResponse(html)
+
+class EditMessage(GenericAPIView):
+    authentication_classes = ()
+
+    def patch(self, request):
+        body = json.loads(request.body)
+        message_id = body.get("message_id", None)
+        content = body.get("content", None)
+        doYesterday = body.get("do_yesterday", None)
+        doToday = body.get("do_today", None)
+        post = Post.objects.filter(message_id=message_id).first()
+        post.content = content
+        post.save()
+        post_serializer = PostSerializer(instance=post)
+        res = post_serializer.data
+        return Response(res)
+
+class UpdateMessage(GenericAPIView):
+    authentication_classes = ()
+
+    def post(self,request):
+        print('#############################')
+        print(request)
+        abc = request.body
+        body = json.loads(request.body)
+        print(str(abc))
+        print(type(abc))
+        print(type(str(abc)))
+        # body = json.loads(request.body)
+        # message_id = body.get("message_id", None)
+        # print(message_id)
+        return HttpResponse('<h1>ok</h1>')
 
 class SaveUser(GenericAPIView):
     authentication_classes = ()

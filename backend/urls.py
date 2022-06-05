@@ -15,4 +15,8 @@ urlpatterns = [
     path('get-yesterday-post/<int:user_id>', views.GetYesterdayPost.as_view()),
 
     path('edit-post/<str:message_id>',views.EditPost.as_view()),
+
+    path('message', views.EditMessage.as_view()),
+
+    path('update', views.UpdateMessage.as_view() ),
 ]
