@@ -123,15 +123,22 @@ async def on_message(message):
         string = 'Hi ' + message.author.name
         await message.channel.send(string)
 
-    # if message.content == '#edit-td':
-
-    if message.content == 'bye':
-        string = 'Goodbye ' + message.author.name
-        await message.channel.send(string)
+    if message.content == '#standup':
+        # 0. Test command - da thanh cong
+        mes = 'Da nhan duoc command standup. Co len'
+        pyperclip.copy(mes)
+        pyperclip.paste()
+        pyautogui.hotkey('ctrl', 'v')
+        # 1. Gui thong bao What you did since yesterday:
+        # 2. Xu ly input cua client cho did since yesterday
+        # 3. Gui thong bao What will you do today:
+        # 4. Xu ly input cua client cho do today
+        # 5. Xu ly logic cua content => luu db
 
     if message.content.startswith('edit_did'):
         content = message.content.split(' ', 1)
-        msg_content, msg_id = save_or_update_post(message.author, message.channel, content[1], None, post_type='get-reported-post-today')
+        msg_content, msg_id = save_or_update_post(message.author, message.channel, content[1], None,
+                                                  post_type='get-reported-post-today')
         genesis_channel = bot.get_channel(CHANNEL_ID)
         msg = await genesis_channel.fetch_message(int(msg_id))
         await msg.edit(content=msg_content)
@@ -139,7 +146,8 @@ async def on_message(message):
 
     if message.content.startswith('edit_will'):
         content = message.content.split(' ', 1)
-        msg_content, msg_id = save_or_update_post(message.author, message.channel, None, content[1], post_type='get-reported-post-today')
+        msg_content, msg_id = save_or_update_post(message.author, message.channel, None, content[1],
+                                                  post_type='get-reported-post-today')
         genesis_channel = bot.get_channel(CHANNEL_ID)
         msg = await genesis_channel.fetch_message(int(msg_id))
         await msg.edit(content=msg_content)
@@ -186,7 +194,7 @@ async def td(ctx, *, arg):
     author = ctx.author
     channel = ctx.channel
 
-    report_content , _= save_or_update_post(author, channel, arg, None)
+    report_content, _ = save_or_update_post(author, channel, arg, None)
     message = 'Yay! This is your report looks like for tomorrow: \n' + report_content
 
     await ctx.send(message)
